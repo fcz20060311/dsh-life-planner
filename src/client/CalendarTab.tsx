@@ -100,12 +100,12 @@ export function CalendarTab(): ReactElement {
             <div key={key} className="life-cal-cell" data-today={isToday(key, now) ? 'true' : undefined}>
               <div className="life-cal-day">{Number(key.slice(8, 10))}</div>
               <div className="life-cal-items">
-                {items.slice(0, 3).map((it, j) => (
+                {items.slice(0, 4).map((it, j) => (
                   <div key={j} className="life-cal-item" data-danger={it.danger ? 'true' : undefined} title={it.text}>
                     {it.tag} {it.text}
                   </div>
                 ))}
-                {items.length > 3 ? <div className="life-cal-more">+{items.length - 3}</div> : null}
+                {items.length > 4 ? <div className="life-cal-more">+{items.length - 4}</div> : null}
               </div>
             </div>
           )

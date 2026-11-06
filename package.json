@@ -1,7 +1,7 @@
 {
   "name": "dsh-life-planner",
   "version": "0.1.0",
-  "description": "DSH 生活时间管理插件：一句话记任务、到点/提前一天提醒（Windows 通知）、倒计时、日历视图、正向计时专注与打卡热力图。侧边栏「生活」入口 + 右侧待办条，另给 agent 提供 life_* 工具。",
+  "description": "拾光笺 · DSH 生活时间管理插件（待办/提醒/倒计时/日历/专注/热力图）",
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/types/index.d.ts",

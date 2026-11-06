@@ -1,4 +1,4 @@
-# dsh-life-planner
+# 拾光笺 · dsh-life-planner
 
 ![license](https://img.shields.io/npm/l/dsh-life-planner)
 ![dsh](https://img.shields.io/badge/dsh-%3E%3D0.2.0--rc.2-blue)

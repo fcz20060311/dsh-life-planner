@@ -99,6 +99,11 @@ export function FocusTab(): ReactElement {
                   {s.taskId !== undefined ? <span>关联任务</span> : null}
                 </div>
               </div>
+              <div className="todo-actions">
+                <button type="button" className="todo-btn danger" title="删除这条记录" onClick={() => void todoStore.removeFocus(s.id)}>
+                  删除
+                </button>
+              </div>
             </div>
           ))
         )}

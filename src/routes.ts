@@ -324,6 +324,12 @@ export function makeTodoRoutes(service: TodoService): WebRoute[] {
       return { ok: true, session: service.stopFocus() }
     }),
 
+    postRoute(`${TODO_API_PREFIX}/focus/delete`, (body) => {
+      const id = typeof body.id === 'string' ? body.id : ''
+      service.removeFocusSession(id)
+      return { ok: true }
+    }),
+
     // 统计热力图
     getRoute(`${TODO_API_PREFIX}/heatmap`, () => ({ ok: true, heatmap: service.heatmap() })),
   ]

@@ -61,7 +61,7 @@ export function registerPanel(ctx: SeatContext): () => void {
     name: 'sidebar.panellist',
     id: PANEL_ID,
     order: PANEL_ORDER,
-    label: () => '生活',
+    label: () => '拾光笺',
   }, PanelIcon)))
   const Page = (): ReactElement => (
     <div className="todo-panel-page" data-dsh-todo-view="" data-dsh-plugin="life-planner-layer">

@@ -51,5 +51,6 @@ export const todoApi = {
   focusStart: (taskId?: string) =>
     todoFetch<{ ok: boolean, focusRunning: FocusRun }>('/api/life/focus/start', taskId === undefined ? {} : { taskId }),
   focusStop: () => todoFetch<{ ok: boolean, session: FocusSession }>('/api/life/focus/stop', {}),
+  deleteFocus: (id: string) => todoFetch<{ ok: boolean }>('/api/life/focus/delete', { id }),
   heatmap: () => todoFetch<{ ok: boolean, heatmap: Record<string, HeatmapCell> }>('/api/life/heatmap'),
 }

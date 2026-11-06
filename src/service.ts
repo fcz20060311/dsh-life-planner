@@ -279,6 +279,12 @@ export class TodoService {
     return { ...session }
   }
 
+  /** 删除一条专注记录。 */
+  removeFocusSession(id: string): void {
+    this.doc.focusSessions = this.doc.focusSessions.filter((s) => s.id !== id)
+    this.flush()
+  }
+
   /** 最近 days 天的热力图：按本地日期聚合「完成待办数 + 专注毫秒」。 */
   heatmap(days = 365): Record<string, HeatmapCell> {
     const result: Record<string, HeatmapCell> = {}

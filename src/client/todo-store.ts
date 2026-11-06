@@ -138,6 +138,11 @@ class TodoStore {
     await this.refresh()
   }
 
+  async removeFocus(id: string): Promise<void> {
+    await todoApi.deleteFocus(id)
+    await this.refresh()
+  }
+
   /** 完成待办；若开启「完成需确认」则先弹确认框。 */
   async completeTodo(todo: TodoItem, reminderId?: string): Promise<void> {
     if (todo.confirmOnComplete) {

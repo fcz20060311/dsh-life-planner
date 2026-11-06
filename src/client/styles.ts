@@ -421,7 +421,7 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr) minmax(0, 1fr);
   grid-template-rows: repeat(3, minmax(0, 1fr));
   grid-template-areas:
     "tasks cal countdown"
