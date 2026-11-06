@@ -489,6 +489,89 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
 .life-heat-cell[data-level='4'] { background: var(--dsw-alias-state-business-primary); }
 .life-heat-legend { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--dsw-alias-label-tertiary); flex: none; }
 
+/* --- 便签墙（Sticky wall）风格 ------------------------------------------- */
+.life-board {
+  padding: 10px;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--dsw-alias-border-l2) 55%, transparent) 1px, transparent 1.2px) 0 0 / 16px 16px,
+    var(--dsw-alias-bg-layer-1);
+  border: 1px solid var(--dsw-alias-border-l1);
+  box-shadow: inset 0 2px 22px rgba(0, 0, 0, .28);
+}
+.life-cell {
+  background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 40%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--dsw-alias-border-l2) 70%, transparent);
+  border-radius: 12px;
+}
+.life-cell-head { display: flex; align-items: center; gap: 6px; font-size: 11.5px; letter-spacing: .1em; }
+.life-cell-head::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dsw-alias-state-business-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dsw-alias-state-business-primary) 18%, transparent);
+}
+
+/* 便签本体：纸感、胶带、轻微歪斜 */
+.todo-item {
+  position: relative;
+  padding: 15px 12px 10px;
+  border: none;
+  border-radius: 3px 9px 4px 10px;
+  background: var(--note-bg, #f6e2a1);
+  color: #332f28;
+  transform: rotate(var(--note-rot, 0deg));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .35), 0 10px 22px -14px rgba(0, 0, 0, .6);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.todo-item::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 52px;
+  height: 13px;
+  transform: translateX(-50%) rotate(-2.5deg);
+  background: rgba(255, 255, 255, .22);
+  border: 1px solid rgba(255, 255, 255, .16);
+}
+.todo-item:hover {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, .4), 0 16px 30px -16px rgba(0, 0, 0, .7);
+  z-index: 2;
+}
+.todo-item .todo-item-title { color: #332f28; }
+.todo-item .todo-item-note { color: rgba(51, 47, 40, .74); }
+.todo-item .todo-item-meta { color: rgba(51, 47, 40, .58); }
+.todo-item .todo-badge { border-color: rgba(0, 0, 0, .18); color: rgba(51, 47, 40, .88); background: rgba(255, 255, 255, .35); }
+.todo-item .todo-btn { color: rgba(51, 47, 40, .82); background: rgba(255, 255, 255, .3); border-color: rgba(0, 0, 0, .14); }
+.todo-item .todo-btn.primary { background: rgba(0, 0, 0, .08); }
+.todo-item .todo-btn.danger { color: #8d2f2f; }
+
+/* 便签配色轮转（颜色 + 歪斜角度） */
+.todo-list > .todo-item:nth-child(6n+1) { --note-bg: #f6e2a1; --note-rot: -1.2deg; }
+.todo-list > .todo-item:nth-child(6n+2) { --note-bg: #bfe0cb; --note-rot: 0.9deg; }
+.todo-list > .todo-item:nth-child(6n+3) { --note-bg: #c3dbee; --note-rot: -0.6deg; }
+.todo-list > .todo-item:nth-child(6n+4) { --note-bg: #e0d0f0; --note-rot: 1.4deg; }
+.todo-list > .todo-item:nth-child(6n+5) { --note-bg: #f6cfbb; --note-rot: -1.4deg; }
+.todo-list > .todo-item:nth-child(6n+6) { --note-bg: #f2c3d2; --note-rot: 0.7deg; }
+.todo-list { padding: 6px 2px 8px; }
+
+/* 表单 = 一张待写的空白便签 */
+.todo-form {
+  padding: 10px;
+  background: var(--dsw-alias-bg-layer-2);
+  border: 1.5px dashed var(--dsw-alias-border-l2);
+  border-radius: 10px;
+}
+.todo-form .todo-input { background: var(--dsw-alias-bg-base); }
+
+/* 日历格子 / 统计卡片也带点纸片感 */
+.life-cal-cell { background: color-mix(in srgb, var(--dsw-alias-bg-layer-2) 82%, transparent); border-radius: 6px; }
+.life-stat-card { border: none; background: var(--dsw-alias-bg-layer-2); border-radius: 4px 10px 5px 9px; box-shadow: 0 6px 14px -10px rgba(0, 0, 0, .6); }
+
 @media (prefers-reduced-motion: reduce) {
   .todo-toast { animation: none; }
   .todo-toast[data-style='danger'] { animation: none; }
