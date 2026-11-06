@@ -72,7 +72,7 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
 [data-sidebar-collapsed] [data-dsh-todo-entry] .todo-entry-label { display: none; }
 
 /* --- 官方 main 座位里的页面外层（外壳只在选中本面板时挂载它） ----------- */
-.todo-panel-page { display: flex; flex-direction: column; height: 100%; max-height: 100%; min-height: 0; overflow: hidden; box-sizing: border-box; padding-top: 8px; }
+.todo-panel-page { display: flex; flex-direction: column; height: 100%; max-height: 100%; min-height: 0; overflow: hidden; box-sizing: border-box; padding-top: 30px; }
 .todo-panel-page > .todo-panel { flex: 1 1 auto; min-height: 0; }
 
 /* --- 面板主体 ------------------------------------------------------------ */
@@ -88,9 +88,12 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
   color: var(--dsw-alias-label-primary);
   font-family: var(--dsw-font-family);
 }
-.todo-topbar { display: flex; align-items: center; gap: 10px; flex: none; flex-wrap: wrap; }
-.todo-back { flex: none; padding: 5px 10px; font-size: 13px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; cursor: pointer; font-family: inherit; }
-.todo-back:hover { background: var(--dsw-alias-interactive-bg-hover); border-color: var(--dsw-alias-state-business-primary); }
+.todo-topbar { display: flex; align-items: center; gap: 8px; flex: none; flex-wrap: nowrap; min-height: 26px; }
+.todo-topbar .todo-count { margin-left: auto; }
+.todo-back { flex: none; padding: 4px 10px; font-size: 12.5px; color: var(--dsw-alias-label-secondary); background: transparent; border: 1px solid var(--dsw-alias-border-l1); border-radius: 7px; cursor: pointer; font-family: inherit; transition: color .15s, border-color .15s; }
+.todo-back:hover { color: var(--dsw-alias-label-primary); border-color: var(--dsw-alias-border-l3); }
+.todo-close { flex: none; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; font-size: 13px; color: var(--dsw-alias-label-tertiary); background: transparent; border: 1px solid transparent; border-radius: 7px; cursor: pointer; font-family: inherit; transition: color .15s, background .15s; }
+.todo-close:hover { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); }
 .todo-header { display: flex; align-items: center; gap: 10px; flex: none; }
 .todo-title { margin: 0; font-size: 16px; font-weight: 700; color: var(--dsw-alias-label-primary); white-space: nowrap; }
 .todo-count { flex: none; font-size: 12px; color: var(--dsw-alias-label-tertiary); background: var(--dsw-alias-interactive-bg-hover); border-radius: 999px; padding: 1px 8px; }
@@ -418,12 +421,20 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    "tasks cal countdown"
+    "tasks cal focus"
+    "tasks cal stats";
   gap: 12px;
   overflow: hidden;
 }
-.life-cell-tasks { grid-row: 1 / 3; }
+.life-cell-tasks { grid-area: tasks; }
+.life-cell-cal { grid-area: cal; }
+.life-cell-countdown { grid-area: countdown; }
+.life-cell-focus { grid-area: focus; }
+.life-cell-stats { grid-area: stats; }
 .life-cell {
   min-width: 0;
   min-height: 0;
@@ -448,11 +459,13 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
 .life-cell .life-heat { flex-wrap: nowrap; }
 @media (max-width: 1180px) {
   .life-board {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: none;
+    grid-auto-rows: minmax(280px, auto);
     overflow-y: auto;
   }
-  .life-cell-tasks { grid-row: auto; grid-column: 1 / 3; }
+  .life-cell { grid-area: auto; }
 }
 
 /* --- 日历 ---------------------------------------------------------------- */

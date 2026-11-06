@@ -171,11 +171,10 @@ export function TodoPanel(props: { onClose?: () => void }): ReactElement {
         <button type="button" className="todo-back" onClick={() => onClose?.()} title="返回对话（Esc）">
           ← 返回
         </button>
-        <h1 className="todo-title">生活</h1>
         <span className="todo-count">{pending} 待办{countdowns > 0 ? ` · ${countdowns} 倒计时` : ''}</span>
         <button
           type="button"
-          className="todo-btn"
+          className="todo-close"
           title="关闭面板（Esc 也可以）"
           aria-label="关闭"
           onClick={() => { onClose?.() }}
@@ -189,19 +188,19 @@ export function TodoPanel(props: { onClose?: () => void }): ReactElement {
           <div className="life-cell-head">待办</div>
           <TodoSection />
         </section>
-        <section className="life-cell">
-          <div className="life-cell-head">倒计时</div>
-          <CountdownTab />
-        </section>
-        <section className="life-cell">
+        <section className="life-cell life-cell-cal">
           <div className="life-cell-head">日历</div>
           <CalendarTab />
         </section>
-        <section className="life-cell">
+        <section className="life-cell life-cell-countdown">
+          <div className="life-cell-head">倒计时</div>
+          <CountdownTab />
+        </section>
+        <section className="life-cell life-cell-focus">
           <div className="life-cell-head">专注</div>
           <FocusTab />
         </section>
-        <section className="life-cell">
+        <section className="life-cell life-cell-stats">
           <div className="life-cell-head">统计</div>
           <StatsTab />
         </section>
