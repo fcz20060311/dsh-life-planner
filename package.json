@@ -1,0 +1,85 @@
+{
+  "name": "dsh-life-planner",
+  "version": "0.1.0",
+  "description": "DSH 生活时间管理插件：一句话记任务、到点/提前一天提醒（Windows 通知）、倒计时、日历视图、正向计时专注与打卡热力图。侧边栏「生活」入口 + 右侧待办条，另给 agent 提供 life_* 工具。",
+  "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "types": "./lib/types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "Apache-2.0",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime"
+      ],
+      "platform": "web"
+    },
+    "engines": {
+      "dsh": ">=0.2.0-rc.2"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "~18.3.0",
+    "@types/react-dom": "~18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsdown": "^0.22.14",
+    "typescript": "^5.7.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:client": "tsdown",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.client.json",
+    "prepack": "npm run build && npm run build:client",
+    "check:compat": "node scripts/check-compat.mjs"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "todo",
+    "planner",
+    "calendar",
+    "countdown",
+    "focus",
+    "reminder",
+    "notification",
+    "生活",
+    "待办",
+    "提醒",
+    "倒计时",
+    "专注"
+  ],
+  "author": "fcz20060311",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fcz20060311/dsh-life-planner.git"
+  },
+  "homepage": "https://github.com/fcz20060311/dsh-life-planner#readme",
+  "bugs": {
+    "url": "https://github.com/fcz20060311/dsh-life-planner/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
