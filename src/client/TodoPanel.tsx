@@ -25,6 +25,13 @@ function formatDue(ms: number): string {
   return `${d.getMonth() + 1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
+/** 本地自然日的 0 点。 */
+function startOfDay(ms: number): number {
+  const d = new Date(ms)
+  d.setHours(0, 0, 0, 0)
+  return d.getTime()
+}
+
 /** 待办区：极简表单 + 列表。 */
 function TodoSection(): ReactElement {
   const { data } = useSyncExternalStore(todoStore.subscribe, todoStore.getSnapshot)
@@ -51,6 +58,12 @@ function TodoSection(): ReactElement {
   const todos = data?.todos ?? []
   const pending = todos.filter((t) => !t.done)
   const done = todos.filter((t) => t.done)
+
+  // 「今日待办」= 到期日不晚于今天（含已逾期未完成的）；其余归到「非今日」。
+  const todayStart = startOfDay(Date.now())
+  const isToday = (t: TodoItem): boolean => t.dueAt !== undefined && startOfDay(t.dueAt) <= todayStart
+  const todayPending = pending.filter(isToday)
+  const laterPending = pending.filter((t) => !isToday(t))
 
   const submit = async (): Promise<void> => {
     const trimmed = title.trim()
@@ -137,8 +150,11 @@ function TodoSection(): ReactElement {
         {pending.length === 0 && done.length === 0 ? (
           <div className="todo-empty">还没有待办。加一条，设个时间，到期会提醒你。</div>
         ) : null}
-        {pending.length > 0 ? <div className="todo-section-title">待办</div> : null}
-        {pending.map(renderItem)}
+        {pending.length > 0 ? <div className="todo-section-title">今日待办 · {todayPending.length}</div> : null}
+        {todayPending.length === 0 && pending.length > 0 ? <div className="todo-empty">今天没有要做的</div> : null}
+        {todayPending.map(renderItem)}
+        {laterPending.length > 0 ? <div className="todo-section-title">非今日 · {laterPending.length}</div> : null}
+        {laterPending.map(renderItem)}
         {done.length > 0 ? <div className="todo-section-title">已完成</div> : null}
         {done.map(renderItem)}
       </div>
