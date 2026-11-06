@@ -6,7 +6,6 @@
 
 import { useEffect, useSyncExternalStore, useState, type ReactElement } from 'react'
 import { todoStore } from './todo-store.ts'
-import { STYLE_META } from './styles.ts'
 import { type TodoItem } from '../types.ts'
 import { CountdownTab } from './CountdownTab.tsx'
 import { CalendarTab } from './CalendarTab.tsx'
@@ -74,9 +73,7 @@ function TodoSection(): ReactElement {
         {todo.note !== '' ? <div className="todo-item-note">{todo.note}</div> : null}
         {todo.dueAt !== undefined ? (
           <div className="todo-item-meta">
-            <span className="todo-badge" data-style={todo.reminderStyle}>
-              {STYLE_META[todo.reminderStyle].icon} {formatDue(todo.dueAt)}
-            </span>
+            <span className="todo-badge">{formatDue(todo.dueAt)}</span>
             {todo.advanceAt !== undefined ? <span>提前一天提醒</span> : null}
           </div>
         ) : null}

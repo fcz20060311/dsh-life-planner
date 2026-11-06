@@ -8,7 +8,6 @@
 
 import { useEffect, useSyncExternalStore, type ReactElement } from 'react'
 import { todoStore } from './todo-store.ts'
-import { STYLE_META } from './styles.ts'
 import { TodoDock } from './TodoDock.tsx'
 import { DEFAULT_TODO_SETTINGS, type ReminderEvent, type TodoState } from '../types.ts'
 
@@ -19,11 +18,9 @@ function formatTime(ms: number): string {
 }
 
 function ReminderToast({ reminder, snoozeMinutes }: { reminder: ReminderEvent; snoozeMinutes: number[] }): ReactElement {
-  const meta = STYLE_META[reminder.style]
   return (
-    <div className="todo-toast" data-style={reminder.style} key={reminder.id}>
+    <div className="todo-toast" key={reminder.id}>
       <div className="todo-toast-head">
-        <span className="todo-toast-icon">{meta.icon}</span>
         <span className="todo-toast-title">{reminder.title}</span>
         <span className="todo-toast-sub">{formatTime(reminder.firedAt)}</span>
       </div>

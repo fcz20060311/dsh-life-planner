@@ -6,7 +6,7 @@
  */
 
 import type { TodoService } from './service.js'
-import { isDateString, isReminderStyle, REMINDER_STYLES, type TodoItem, type TodoState } from './types.js'
+import { isDateString, isReminderStyle, type TodoItem, type TodoState } from './types.js'
 
 /** 手写的 registry-ready 工具定义（与 @deepseek-ai/dsh-tools 的 ToolDefinition 对齐）。 */
 export interface TodoToolDefinition {
@@ -66,7 +66,6 @@ function renderList(state: TodoState, status: 'pending' | 'done' | 'all'): strin
     const mark = t.done ? '✓' : '·'
     const parts = [`${mark} ${t.title}`]
     if (t.dueAt !== undefined) parts.push(`提醒 ${fmtTime(t.dueAt)}`)
-    parts.push(`样式 ${t.reminderStyle}`)
     if (t.confirmOnComplete) parts.push('完成需确认')
     parts.push(`id=${t.id}`)
     return parts.join('  ')
@@ -85,11 +84,6 @@ export function makeTodoTools(service: TodoService): TodoToolDefinition[] {
         note: { type: 'string', description: '备注（可选）' },
         dueInMinutes: { type: 'integer', description: '相对提醒：多少分钟后提醒（与 dueAt 二选一，优先用这个，如 30）' },
         dueAt: { type: 'integer', description: '绝对提醒时间（epoch 毫秒），与 dueInMinutes 二选一' },
-        reminderStyle: {
-          type: 'string',
-          enum: [...REMINDER_STYLES],
-          description: '提醒样式：info 提醒 / success 纪念 / warning 注意 / danger 紧急，默认 info',
-        },
         confirmOnComplete: { type: 'boolean', description: '完成前是否需要用户确认，默认 false' },
       },
       required: ['title'],
@@ -109,7 +103,7 @@ export function makeTodoTools(service: TodoService): TodoToolDefinition[] {
         reminderStyle: isReminderStyle(a.reminderStyle) ? a.reminderStyle : 'info',
         confirmOnComplete: a.confirmOnComplete === true,
       })
-      const tail = todo.dueAt !== undefined ? `，将在 ${fmtTime(todo.dueAt)} 提醒（样式 ${todo.reminderStyle}）` : '（未设提醒时间，仅记入待办）'
+      const tail = todo.dueAt !== undefined ? `，将在 ${fmtTime(todo.dueAt)} 提醒` : '（未设提醒时间，仅记入待办）'
       return `已添加待办「${todo.title}」${tail}`
     },
   }
