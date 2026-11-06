@@ -10,8 +10,7 @@ import { useEffect, useSyncExternalStore, type ReactElement } from 'react'
 import { todoStore } from './todo-store.ts'
 import { STYLE_META } from './styles.ts'
 import { TodoDock } from './TodoDock.tsx'
-import { armSoundUnlock, isSoundReady, playSound } from './sound.ts'
-import { DEFAULT_TODO_SETTINGS, type ReminderEvent, type ReminderStyle, type TodoState } from '../types.ts'
+import { DEFAULT_TODO_SETTINGS, type ReminderEvent, type TodoState } from '../types.ts'
 
 function formatTime(ms: number): string {
   const d = new Date(ms)
@@ -83,25 +82,7 @@ function ConfirmDialog(): ReactElement | null {
 
 export function ReminderLayer(): ReactElement {
   const { activeReminders, freshReminders, data } = useSyncExternalStore(todoStore.subscribe, todoStore.getSnapshot)
-  const soundByStyle: Record<ReminderStyle, boolean> = data?.settings.soundByStyle ?? DEFAULT_TODO_SETTINGS.soundByStyle
   const snoozeMinutes: number[] = data?.settings.snoozeMinutes ?? DEFAULT_TODO_SETTINGS.snoozeMinutes
-  const soundSettings = data?.settings.sound ?? DEFAULT_TODO_SETTINGS.sound
-
-  // 音频解锁：浏览器要求先有用户手势才允许出声，这里在首个手势时自动完成。
-  useEffect(() => armSoundUnlock(), [])
-
-  // 新提醒 → 页面内提醒音。与标签页是否在前台无关，因此「开着 DSH 也能听见」。
-  useEffect(() => {
-    if (freshReminders.length === 0 || !soundSettings.inPage) return
-    for (const reminder of freshReminders) {
-      if (soundByStyle[reminder.style] === false) continue
-      playSound(
-        reminder.style,
-        soundSettings.volume,
-        reminder.style === 'danger' ? soundSettings.dangerRepeat : 1,
-      )
-    }
-  }, [freshReminders, soundByStyle, soundSettings])
 
   // SSE 实时订阅 + 回到前台时兜底轮询。
   useEffect(() => {
@@ -140,19 +121,17 @@ export function ReminderLayer(): ReactElement {
     if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
     if (document.visibilityState !== 'hidden') return
     for (const reminder of freshReminders) {
-      const meta = STYLE_META[reminder.style]
       try {
-        new Notification(`${meta.icon} ${meta.label}：${reminder.title}`, {
-          body: '点击回到 DSH 处理（完成 / 稍后提醒 / 忽略）',
-          tag: `dsh-todo-${reminder.id}`,
-          // 页面内音效已负责出声时，系统通知静音，避免响两遍；未解锁则交回系统提示音。
-          silent: soundSettings.inPage && isSoundReady() ? true : soundByStyle[reminder.style] === false,
+        new Notification(`⏰ ${reminder.title}`, {
+          body: reminder.kind === 'advance' ? '提前提醒：明天到期' : '到点了',
+          tag: `dsh-life-${reminder.id}`,
+          silent: true,
         })
       } catch {
         // 个别环境不支持，忽略。
       }
     }
-  }, [freshReminders, soundByStyle, soundSettings])
+  }, [freshReminders])
 
   return (
     <>

@@ -88,7 +88,19 @@ export function registerPanel(ctx: SeatContext): () => void {
  * 表现就是「插件一加载，界面自己跳回会话」，把你正在看的页面顶掉。
  */
 export function closePanel(ctx: SeatContext): void {
-  try { ctx.layout?.selectPanel?.(null) } catch (error) { console.warn('[dsh-life-planner] 切回对话失败:', error) }
+  // 首选：让外壳把主视图切回对话。
+  try {
+    if (typeof ctx.layout?.selectPanel === 'function') {
+      ctx.layout.selectPanel(null)
+      return
+    }
+  } catch (error) {
+    console.warn('[dsh-life-planner] 切回对话失败:', error)
+  }
+  // 兜底：外壳没暴露 selectPanel 时，点一下侧边栏「新会话」，保证一定能退出去。
+  try {
+    document.querySelector<HTMLElement>('[class*="newSession"]')?.click()
+  } catch { /* 忽略 */ }
 }
 
 /**
