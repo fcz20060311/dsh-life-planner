@@ -27,6 +27,16 @@ export function FocusTab(): ReactElement {
   const [now, setNow] = useState(() => Date.now())
   const [taskId, setTaskId] = useState('')
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const remove = async (id: string): Promise<void> => {
+    setError('')
+    try {
+      await todoStore.removeFocus(id)
+    } catch {
+      setError('删除失败：新加的删除接口还没生效，重启一次 DSH 就好。')
+    }
+  }
 
   const running = data?.focusRunning ?? null
   const sessions = data?.focusSessions ?? []
@@ -86,6 +96,8 @@ export function FocusTab(): ReactElement {
         累计专注 <b>{formatDuration(totalMs)}</b> · 共 {sessions.length} 次
       </div>
 
+      {error !== '' ? <div className="todo-error">{error}</div> : null}
+
       <div className="todo-list">
         {sessions.length === 0 ? (
           <div className="todo-empty">还没有专注记录。点「开始专注」，结束后这里会有记录。</div>
@@ -100,7 +112,7 @@ export function FocusTab(): ReactElement {
                 </div>
               </div>
               <div className="todo-actions">
-                <button type="button" className="todo-btn danger" title="删除这条记录" onClick={() => void todoStore.removeFocus(s.id)}>
+                <button type="button" className="todo-btn danger" title="删除这条记录" onClick={() => void remove(s.id)}>
                   删除
                 </button>
               </div>
