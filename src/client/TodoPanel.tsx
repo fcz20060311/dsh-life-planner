@@ -150,10 +150,10 @@ function TodoSection(): ReactElement {
         {pending.length === 0 && done.length === 0 ? (
           <div className="todo-empty">还没有待办。加一条，设个时间，到期会提醒你。</div>
         ) : null}
-        {pending.length > 0 ? <div className="todo-section-title">今日待办 · {todayPending.length}</div> : null}
-        {todayPending.length === 0 && pending.length > 0 ? <div className="todo-empty">今天没有要做的</div> : null}
+        {pending.length > 0 ? <div className="todo-section-title">今日拾光 · {todayPending.length}</div> : null}
+        {todayPending.length === 0 && pending.length > 0 ? <div className="todo-empty">今天空着，慢慢来</div> : null}
         {todayPending.map(renderItem)}
-        {laterPending.length > 0 ? <div className="todo-section-title">非今日 · {laterPending.length}</div> : null}
+        {laterPending.length > 0 ? <div className="todo-section-title">来日可期 · {laterPending.length}</div> : null}
         {laterPending.map(renderItem)}
         {done.length > 0 ? <div className="todo-section-title">已完成</div> : null}
         {done.map(renderItem)}
