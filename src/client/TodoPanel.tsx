@@ -1,6 +1,6 @@
 /**
- * 生活面板：页签式（待办 / 倒计时 / 日历 / 专注 / 统计）。
- * 待办页只保留核心：标题、备注、到期时间、完成、删除。
+ * 生活面板：单页多栏布局（待办 / 倒计时 / 日历 / 专注 / 统计 同屏）。
+ * 待办区只保留核心：标题、备注、到期时间、完成、删除。
  * @module dsh-life-planner/client/TodoPanel
  */
 
@@ -12,16 +12,6 @@ import { CountdownTab } from './CountdownTab.tsx'
 import { CalendarTab } from './CalendarTab.tsx'
 import { FocusTab } from './FocusTab.tsx'
 import { StatsTab } from './StatsTab.tsx'
-
-type TabId = 'todo' | 'countdown' | 'calendar' | 'focus' | 'stats'
-
-const TABS: Array<{ id: TabId, label: string }> = [
-  { id: 'todo', label: '待办' },
-  { id: 'countdown', label: '倒计时' },
-  { id: 'calendar', label: '日历' },
-  { id: 'focus', label: '专注' },
-  { id: 'stats', label: '统计' },
-]
 
 /** 把 datetime-local 字符串转 epoch ms（无效返回 undefined）。 */
 function toEpoch(value: string): number | undefined {
@@ -36,8 +26,8 @@ function formatDue(ms: number): string {
   return `${d.getMonth() + 1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-/** 待办页签：极简表单 + 列表。 */
-function TodoTab(): ReactElement {
+/** 待办区：极简表单 + 列表。 */
+function TodoSection(): ReactElement {
   const { data } = useSyncExternalStore(todoStore.subscribe, todoStore.getSnapshot)
   const [title, setTitle] = useState('')
   const [note, setNote] = useState('')
@@ -108,7 +98,7 @@ function TodoTab(): ReactElement {
     <div className="life-tab">
       {notifPermission !== 'granted' ? (
         <div className="todo-settings">
-          <span className="todo-settings-hint">开启系统通知后，切出到别的窗口也能收到 Windows 通知。</span>
+          <span className="todo-settings-hint">开启系统通知后，切出窗口也能收到 Windows 通知。</span>
           <button type="button" className="todo-btn" onClick={() => void requestNotification()}>
             {notifPermission === 'denied' ? '系统通知已阻止' : '开启系统通知'}
           </button>
@@ -140,7 +130,7 @@ function TodoTab(): ReactElement {
             type="datetime-local"
             title="到期时间（可选，到点会提醒）"
             value={dueAt}
-            style={{ flex: '0 1 auto', minWidth: 190 }}
+            style={{ flex: '0 1 auto', minWidth: 0 }}
             onChange={(e) => setDueAt(e.target.value)}
           />
         </div>
@@ -162,7 +152,6 @@ function TodoTab(): ReactElement {
 export function TodoPanel(props: { onClose?: () => void }): ReactElement {
   const onClose = props.onClose
   const { data } = useSyncExternalStore(todoStore.subscribe, todoStore.getSnapshot)
-  const [activeTab, setActiveTab] = useState<TabId>('todo')
 
   const pending = (data?.todos ?? []).filter((t) => !t.done).length
   const countdowns = (data?.countdowns ?? []).length
@@ -182,19 +171,7 @@ export function TodoPanel(props: { onClose?: () => void }): ReactElement {
         <button type="button" className="todo-back" onClick={() => onClose?.()} title="返回对话（Esc）">
           ← 返回
         </button>
-        <div className="todo-tabs">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              className="todo-tab"
-              data-active={activeTab === tab.id ? 'true' : 'false'}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <h1 className="todo-title">生活</h1>
         <span className="todo-count">{pending} 待办{countdowns > 0 ? ` · ${countdowns} 倒计时` : ''}</span>
         <button
           type="button"
@@ -207,11 +184,28 @@ export function TodoPanel(props: { onClose?: () => void }): ReactElement {
         </button>
       </div>
 
-      {activeTab === 'todo' ? <TodoTab /> : null}
-      {activeTab === 'countdown' ? <CountdownTab /> : null}
-      {activeTab === 'calendar' ? <CalendarTab /> : null}
-      {activeTab === 'focus' ? <FocusTab /> : null}
-      {activeTab === 'stats' ? <StatsTab /> : null}
+      <div className="life-board">
+        <section className="life-cell life-cell-tasks">
+          <div className="life-cell-head">待办</div>
+          <TodoSection />
+        </section>
+        <section className="life-cell">
+          <div className="life-cell-head">倒计时</div>
+          <CountdownTab />
+        </section>
+        <section className="life-cell">
+          <div className="life-cell-head">日历</div>
+          <CalendarTab />
+        </section>
+        <section className="life-cell">
+          <div className="life-cell-head">专注</div>
+          <FocusTab />
+        </section>
+        <section className="life-cell">
+          <div className="life-cell-head">统计</div>
+          <StatsTab />
+        </section>
+      </div>
     </div>
   )
 }

@@ -413,6 +413,48 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
 /* --- 各页签通用 ---------------------------------------------------------- */
 .life-tab { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overflow-y: auto; }
 
+/* --- 单页多栏布局（待办/倒计时/日历/专注/统计同屏） ---------------------- */
+.life-board {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  overflow: hidden;
+}
+.life-cell-tasks { grid-row: 1 / 3; }
+.life-cell {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px 12px;
+  background: var(--dsw-alias-bg-layer-1);
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.life-cell-head {
+  flex: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--dsw-alias-label-tertiary);
+}
+.life-cell .todo-empty { padding: 12px 6px; }
+.life-cell .life-focus-clock { font-size: 40px; padding: 10px 0; }
+.life-cell .life-heat { flex-wrap: nowrap; }
+@media (max-width: 1180px) {
+  .life-board {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    overflow-y: auto;
+  }
+  .life-cell-tasks { grid-row: auto; grid-column: 1 / 3; }
+}
+
 /* --- 日历 ---------------------------------------------------------------- */
 .life-cal-head { display: flex; align-items: center; gap: 8px; flex: none; }
 .life-cal-title { flex: 1; font-size: 14px; font-weight: 700; }
