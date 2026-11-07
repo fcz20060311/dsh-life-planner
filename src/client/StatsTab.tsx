@@ -80,10 +80,10 @@ export function StatsTab(): ReactElement {
 
   // 扇形图：按「自定义名称 / 关联待办」聚合所选时间段的专注时长。
   const titleOf = (session: FocusSession): string => {
-    if (session.label !== undefined) return session.label
-    if (session.taskId === undefined) return '未关联任务'
+    if (session.label !== undefined && session.label !== '') return session.label
+    if (session.taskId === undefined) return '未命名'
     const hit = todos.find((t) => t.id === session.taskId)
-    return hit === undefined ? '未关联任务' : hit.title
+    return hit === undefined ? '未命名' : hit.title
   }
   const start = rangeStart(range, new Date(now)).getTime()
   const pieMap = new Map<string, number>()

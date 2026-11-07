@@ -1,0 +1,12 @@
+拾光笺 (dsh-life-planner)
+Copyright 2026 fcz20060311
+
+This product is based on dsh-todo-reminder by Meltllsy
+(https://github.com/Meltllsy/dsh-todo-reminder), licensed under the
+Apache License, Version 2.0.
+
+Modifications Copyright 2026 fcz20060311: extended into a life/time
+management plugin (countdowns, calendar view, focus timer, statistics),
+simplified reminder UI, and renamed the plugin and its tools.
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).

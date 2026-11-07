@@ -67,6 +67,8 @@ export declare class TodoService {
     stopFocus(): FocusSession;
     /** 删除一条专注记录。 */
     removeFocusSession(id: string): void;
+    /** 给一条专注记录改名（事后补名字）；空字符串表示清除名字。 */
+    renameFocusSession(id: string, label: string): void;
     /** 最近 days 天的热力图：按本地日期聚合「完成待办数 + 专注毫秒」。 */
     heatmap(days?: number): Record<string, HeatmapCell>;
     private pushReminder;

@@ -312,6 +312,16 @@ export class TodoService {
     this.flush()
   }
 
+  /** 给一条专注记录改名（事后补名字）；空字符串表示清除名字。 */
+  renameFocusSession(id: string, label: string): void {
+    const hit = this.doc.focusSessions.find((s) => s.id === id)
+    if (hit === undefined) throw new Error('focus-not-found')
+    const trimmed = label.trim().slice(0, 40)
+    if (trimmed === '') delete hit.label
+    else hit.label = trimmed
+    this.flush()
+  }
+
   /** 最近 days 天的热力图：按本地日期聚合「完成待办数 + 专注毫秒」。 */
   heatmap(days = 365): Record<string, HeatmapCell> {
     const result: Record<string, HeatmapCell> = {}

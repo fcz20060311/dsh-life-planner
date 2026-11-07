@@ -53,5 +53,6 @@ export const todoApi = {
     todoFetch<{ ok: boolean, focusRunning: FocusRun }>('/api/life/focus/start', input ?? {}),
   focusStop: () => todoFetch<{ ok: boolean, session: FocusSession }>('/api/life/focus/stop', {}),
   deleteFocus: (id: string) => todoFetch<{ ok: boolean }>('/api/life/focus/delete', { id }),
+  renameFocus: (id: string, label: string) => todoFetch<{ ok: boolean }>('/api/life/focus/rename', { id, label }),
   heatmap: () => todoFetch<{ ok: boolean, heatmap: Record<string, HeatmapCell> }>('/api/life/heatmap'),
 }

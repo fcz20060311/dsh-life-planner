@@ -28,6 +28,25 @@ export function FocusTab(): ReactElement {
   const [label, setLabel] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
+
+  const beginEdit = (session: FocusSession): void => {
+    setError('')
+    setEditingId(session.id)
+    setDraft(session.label ?? '')
+  }
+
+  const commitEdit = async (): Promise<void> => {
+    if (editingId === null) return
+    const id = editingId
+    setEditingId(null)
+    try {
+      await todoStore.renameFocus(id, draft)
+    } catch {
+      setError('改名失败：这条接口要重启一次 DSH 才生效。')
+    }
+  }
 
   const remove = async (id: string): Promise<void> => {
     setError('')
@@ -115,9 +134,30 @@ export function FocusTab(): ReactElement {
                 <div className="todo-item-title">{formatDuration(s.durationMs)}</div>
                 <div className="todo-item-meta">
                   <span>{formatClock(s.startedAt)} – {formatClock(s.endedAt)}</span>
-                  {s.label !== undefined
-                    ? <span>{s.label}</span>
-                    : s.taskId !== undefined ? <span>关联任务</span> : null}
+                  {editingId === s.id ? (
+                    <input
+                      className="todo-input life-focus-rename"
+                      autoFocus
+                      value={draft}
+                      maxLength={40}
+                      placeholder="这次专注做了什么？"
+                      onChange={(e) => setDraft(e.target.value)}
+                      onBlur={() => void commitEdit()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') void commitEdit()
+                        if (e.key === 'Escape') setEditingId(null)
+                      }}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      className="life-focus-name"
+                      title="点击改名"
+                      onClick={() => beginEdit(s)}
+                    >
+                      {s.label ?? (s.taskId !== undefined ? '关联任务' : '未命名 · 点击命名')}
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="todo-actions">
