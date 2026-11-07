@@ -92,6 +92,8 @@ export class TodoService {
       reminded: false,
       advanceAt: computeAdvanceAt(dueAt, now),
       advanceReminded: false,
+      repeat: input.repeat === 'daily' ? 'daily' : undefined,
+      repeatDone: input.repeat === 'daily' ? 0 : undefined,
     }
     this.doc.todos.unshift(todo)
     this.flush()
@@ -135,10 +137,26 @@ export class TodoService {
     this.flush()
   }
 
-  /** 完成待办（并清理其提醒）。 */
+  /** 完成待办（并清理其提醒）。每天重复的任务不结束，而是顺延到下一天。 */
   complete(id: string): TodoItem | null {
     const todo = this.doc.todos.find((t) => t.id === id)
     if (todo === undefined) return null
+    if (todo.repeat === 'daily') {
+      const now = Date.now()
+      const next = new Date(todo.dueAt ?? now)
+      next.setDate(next.getDate() + 1)
+      while (next.getTime() <= now) next.setDate(next.getDate() + 1)
+      todo.dueAt = next.getTime()
+      todo.advanceAt = computeAdvanceAt(todo.dueAt, now)
+      todo.reminded = false
+      todo.advanceReminded = false
+      todo.snoozedUntil = undefined
+      todo.repeatDone = (todo.repeatDone ?? 0) + 1
+      todo.completedAt = now
+      this.clearRemindersFor(id)
+      this.flush()
+      return { ...todo }
+    }
     todo.done = true
     todo.completedAt = Date.now()
     todo.reminded = true

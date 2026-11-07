@@ -64,7 +64,7 @@ function renderList(state: TodoState, status: 'pending' | 'done' | 'all'): strin
   if (todos.length === 0) return '（无）'
   return todos.map((t) => {
     const mark = t.done ? '✓' : '·'
-    const parts = [`${mark} ${t.title}`]
+    const parts = [`${mark} ${t.repeat === 'daily' ? '🔁 ' : ''}${t.title}`]
     if (t.dueAt !== undefined) parts.push(`提醒 ${fmtTime(t.dueAt)}`)
     if (t.confirmOnComplete) parts.push('完成需确认')
     parts.push(`id=${t.id}`)
@@ -85,6 +85,7 @@ export function makeTodoTools(service: TodoService): TodoToolDefinition[] {
         dueInMinutes: { type: 'integer', description: '相对提醒：多少分钟后提醒（与 dueAt 二选一，优先用这个，如 30）' },
         dueAt: { type: 'integer', description: '绝对提醒时间（epoch 毫秒），与 dueInMinutes 二选一' },
         confirmOnComplete: { type: 'boolean', description: '完成前是否需要用户确认，默认 false' },
+        repeat: { type: 'string', enum: ['daily'], description: '填 daily 表示每天重复：完成后自动顺延到第二天同一时间。' },
       },
       required: ['title'],
     },
@@ -102,9 +103,11 @@ export function makeTodoTools(service: TodoService): TodoToolDefinition[] {
         dueAt: effectiveDueAt,
         reminderStyle: isReminderStyle(a.reminderStyle) ? a.reminderStyle : 'info',
         confirmOnComplete: a.confirmOnComplete === true,
+        repeat: a.repeat === 'daily' ? 'daily' : undefined,
       })
       const tail = todo.dueAt !== undefined ? `，将在 ${fmtTime(todo.dueAt)} 提醒` : '（未设提醒时间，仅记入待办）'
-      return `已添加待办「${todo.title}」${tail}`
+      const rep = todo.repeat === 'daily' ? '，每天重复' : ''
+      return `已添加待办「${todo.title}」${tail}${rep}`
     },
   }
 
@@ -143,7 +146,10 @@ export function makeTodoTools(service: TodoService): TodoToolDefinition[] {
     execute: (args) => {
       const todo = findTodo(service, asArgs(args))
       if (todo === undefined) throw new Error('找不到该待办（请用 life_list_tasks 查看 id 或标题）')
-      service.complete(todo.id)
+      const updated = service.complete(todo.id)
+      if (updated?.repeat === 'daily') {
+        return `已完成今天的「${updated.title}」，明天 ${fmtTime(updated.dueAt ?? Date.now())} 还会再提醒你`
+      }
       return `已完成「${todo.title}」`
     },
   }

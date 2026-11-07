@@ -75,7 +75,7 @@ export function StatsTab(): ReactElement {
   const now = data?.now ?? Date.now()
 
   const totalFocusMs = sessions.reduce((sum, s) => sum + s.durationMs, 0)
-  const completedCount = todos.filter((t) => t.done).length
+  const completedCount = todos.filter((t) => t.done).length + todos.reduce((sum, t) => sum + (t.repeatDone ?? 0), 0)
 
   // 扇形图：按「关联的待办」聚合所选时间段的专注时长。
   const titleOf = (taskId: string | undefined): string => {

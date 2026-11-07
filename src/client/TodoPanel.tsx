@@ -84,9 +84,10 @@ function TodoSection(): ReactElement {
       <div className="todo-item-main">
         <div className="todo-item-title">{todo.title}</div>
         {todo.note !== '' ? <div className="todo-item-note">{todo.note}</div> : null}
-        {todo.dueAt !== undefined ? (
+        {todo.dueAt !== undefined || todo.repeat === 'daily' ? (
           <div className="todo-item-meta">
-            <span className="todo-badge">{formatDue(todo.dueAt)}</span>
+            {todo.repeat === 'daily' ? <span className="todo-badge">🔁 每天</span> : null}
+            {todo.dueAt !== undefined ? <span className="todo-badge">{formatDue(todo.dueAt)}</span> : null}
             {todo.advanceAt !== undefined ? <span>提前一天提醒</span> : null}
           </div>
         ) : null}

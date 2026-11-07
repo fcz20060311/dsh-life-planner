@@ -31,6 +31,10 @@ export interface TodoItem {
     advanceReminded: boolean;
     /** 稍后提醒：在此时间之前不再次触发。 */
     snoozedUntil?: number;
+    /** 重复：'daily' 表示每天同一时间；完成时自动顺延到第二天。 */
+    repeat?: 'daily';
+    /** 重复任务累计完成次数。 */
+    repeatDone?: number;
 }
 /** 提醒类型：提前一天 / 到期。 */
 export type ReminderKind = 'advance' | 'due';
@@ -122,6 +126,8 @@ export interface TodoAddInput {
     dueAt?: number;
     reminderStyle?: ReminderStyle;
     confirmOnComplete?: boolean;
+    /** 'daily' = 每天重复；缺省为一次性。 */
+    repeat?: 'daily';
 }
 /** 新建倒计时的输入。 */
 export interface CountdownAddInput {

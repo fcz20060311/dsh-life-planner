@@ -43,7 +43,7 @@ export declare class TodoService {
     update(id: string, patch: TodoPatch): TodoItem | null;
     /** 删除待办（并清理其提醒）。 */
     remove(id: string): void;
-    /** 完成待办（并清理其提醒）。 */
+    /** 完成待办（并清理其提醒）。每天重复的任务不结束，而是顺延到下一天。 */
     complete(id: string): TodoItem | null;
     /** 稍后提醒：把已触发的提醒延后 minutes 分钟。 */
     snooze(id: string, minutes: number): TodoItem | null;

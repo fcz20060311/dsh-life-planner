@@ -52,6 +52,8 @@ function normalizeTodo(raw: Record<string, unknown>): TodoItem | undefined {
     advanceAt: finiteNum(raw.advanceAt),
     advanceReminded: raw.advanceReminded === true,
     snoozedUntil: finiteNum(raw.snoozedUntil),
+    repeat: raw.repeat === 'daily' ? 'daily' : undefined,
+    repeatDone: finiteNum(raw.repeatDone) ?? (raw.repeat === 'daily' ? 0 : undefined),
   }
 }
 

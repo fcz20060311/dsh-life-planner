@@ -238,6 +238,7 @@ export function makeTodoRoutes(service: TodoService): WebRoute[] {
         dueAt: num(body.dueAt),
         reminderStyle: isReminderStyle(body.reminderStyle) ? body.reminderStyle : 'info',
         confirmOnComplete: body.confirmOnComplete === true,
+        repeat: body.repeat === 'daily' ? 'daily' : undefined,
       }
       return { ok: true, todo: service.add(input) }
     }),

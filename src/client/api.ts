@@ -25,6 +25,7 @@ export interface TodoAddPayload {
   dueAt?: number
   reminderStyle: ReminderStyle
   confirmOnComplete: boolean
+  repeat?: 'daily'
 }
 
 export const todoApi = {
