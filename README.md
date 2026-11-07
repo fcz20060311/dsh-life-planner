@@ -1,6 +1,6 @@
 # 拾光笺 · dsh-life-planner
 
-![license](https://img.shields.io/npm/l/dsh-life-planner)
+![license](https://img.shields.io/badge/license-Apache--2.0-blue)
 ![dsh](https://img.shields.io/badge/dsh-%3E%3D0.2.0--rc.2-blue)
 
 DSH 的**个人生活时间管理**插件 —— 一份跟你所有会话、所有项目都无关的全局清单。
