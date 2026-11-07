@@ -58,7 +58,7 @@ function shortTime(dueAt: number, now: number): string {
   tomorrow.setDate(tomorrow.getDate() + 1)
   if (sameDay(due, today)) return `${pad(due.getHours())}:${pad(due.getMinutes())}`
   if (sameDay(due, tomorrow)) return `明天 ${pad(due.getHours())}:${pad(due.getMinutes())}`
-  return `${due.getMonth() + 1}/${due.getDate()}`
+  return `${due.getMonth() + 1}月${due.getDate()}日 ${pad(due.getHours())}:${pad(due.getMinutes())}`
 }
 
 /** 清单里的到期文案（逾期给出已过多久）。 */
