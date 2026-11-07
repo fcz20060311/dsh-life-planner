@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto'
 import { loadDoc, saveDoc, todoDataFile, type PersistedTodoDoc } from './store.js'
-import { clampNumber, DEFAULT_TODO_SETTINGS, isDateString, isReminderStyle, REMINDER_STYLES, sanitizeMinutesList, type CountdownAddInput, type CountdownItem, type DockSettings, type FocusRun, type FocusSession, type HeatmapCell, type ReminderEvent, type ReminderStyle, type SoundSettings, type TodoAddInput, type TodoItem, type TodoPatch, type TodoSettings, type TodoState } from './types.js'
+import { clampNumber, DEFAULT_TODO_SETTINGS, isDateString, isReminderStyle, REMINDER_STYLES, sanitizeMinutesList, type CountdownAddInput, type CountdownItem, type DockSettings, type FocusRun, type FocusSession, type FocusStartInput, type HeatmapCell, type ReminderEvent, type ReminderStyle, type SoundSettings, type TodoAddInput, type TodoItem, type TodoPatch, type TodoSettings, type TodoState } from './types.js'
 
 export interface TodoServiceConfig {
   /** 调度 tick 间隔（ms）。 */
@@ -270,10 +270,18 @@ export class TodoService {
     this.flush()
   }
 
-  /** 开始一次专注计时（正向计时，不设时长）。 */
-  startFocus(taskId?: string): FocusRun {
+  /** 开始一次专注计时（正向计时，不设时长）。可只带自定义名称，也可关联待办。 */
+  startFocus(input?: FocusStartInput | string): FocusRun {
     if (this.doc.focusRunning !== null) throw new Error('focus-already-running')
-    const run: FocusRun = { startedAt: Date.now(), ...(typeof taskId === 'string' && taskId !== '' ? { taskId } : {}) }
+    const opts: FocusStartInput = typeof input === 'string' ? { taskId: input } : (input ?? {})
+    const taskId = typeof opts.taskId === 'string' && opts.taskId !== '' ? opts.taskId : undefined
+    const rawLabel = typeof opts.label === 'string' ? opts.label.trim() : ''
+    const label = rawLabel === '' ? undefined : rawLabel.slice(0, 40)
+    const run: FocusRun = {
+      startedAt: Date.now(),
+      ...(taskId !== undefined ? { taskId } : {}),
+      ...(label !== undefined ? { label } : {}),
+    }
     this.doc.focusRunning = run
     this.flush()
     return { ...run }
@@ -290,6 +298,7 @@ export class TodoService {
       endedAt,
       durationMs: endedAt - run.startedAt,
       ...(typeof run.taskId === 'string' ? { taskId: run.taskId } : {}),
+      ...(typeof run.label === 'string' && run.label !== '' ? { label: run.label } : {}),
     }
     this.doc.focusSessions.unshift(session)
     this.doc.focusRunning = null

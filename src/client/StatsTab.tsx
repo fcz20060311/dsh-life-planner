@@ -6,6 +6,7 @@
 
 import { useSyncExternalStore, useState, type ReactElement } from 'react'
 import { todoStore } from './todo-store.ts'
+import type { FocusSession } from '../types.ts'
 
 function dayKey(d: Date): string {
   const pad = (n: number): string => String(n).padStart(2, '0')
@@ -77,17 +78,18 @@ export function StatsTab(): ReactElement {
   const totalFocusMs = sessions.reduce((sum, s) => sum + s.durationMs, 0)
   const completedCount = todos.filter((t) => t.done).length + todos.reduce((sum, t) => sum + (t.repeatDone ?? 0), 0)
 
-  // 扇形图：按「关联的待办」聚合所选时间段的专注时长。
-  const titleOf = (taskId: string | undefined): string => {
-    if (taskId === undefined) return '未关联任务'
-    const hit = todos.find((t) => t.id === taskId)
+  // 扇形图：按「自定义名称 / 关联待办」聚合所选时间段的专注时长。
+  const titleOf = (session: FocusSession): string => {
+    if (session.label !== undefined) return session.label
+    if (session.taskId === undefined) return '未关联任务'
+    const hit = todos.find((t) => t.id === session.taskId)
     return hit === undefined ? '未关联任务' : hit.title
   }
   const start = rangeStart(range, new Date(now)).getTime()
   const pieMap = new Map<string, number>()
   for (const s of sessions) {
     if (s.endedAt < start || s.durationMs <= 0) continue
-    const key = titleOf(s.taskId)
+    const key = titleOf(s)
     pieMap.set(key, (pieMap.get(key) ?? 0) + s.durationMs)
   }
   const slices = [...pieMap.entries()]

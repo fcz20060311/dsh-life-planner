@@ -486,6 +486,7 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
 /* --- 专注 ---------------------------------------------------------------- */
 .life-focus-clock { text-align: center; font-size: 48px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .02em; padding: 18px 0; }
 .life-focus-clock[data-running] { color: var(--dsw-alias-state-business-primary); }
+.life-focus-label { text-align: center; margin-top: -10px; margin-bottom: 8px; font-size: 13px; color: var(--dsw-alias-label-secondary); }
 
 /* --- 统计 ---------------------------------------------------------------- */
 .life-stat-line { font-size: 12px; color: var(--dsw-alias-label-secondary); }

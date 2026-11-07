@@ -4,7 +4,7 @@
  * 本地 store/types，因此 host 半 tsc 产物自包含、任何装配路径都能加载。
  * @module dsh-life-planner/service
  */
-import { type CountdownAddInput, type CountdownItem, type DockSettings, type FocusRun, type FocusSession, type HeatmapCell, type ReminderStyle, type SoundSettings, type TodoAddInput, type TodoItem, type TodoPatch, type TodoSettings, type TodoState } from './types.js';
+import { type CountdownAddInput, type CountdownItem, type DockSettings, type FocusRun, type FocusSession, type FocusStartInput, type HeatmapCell, type ReminderStyle, type SoundSettings, type TodoAddInput, type TodoItem, type TodoPatch, type TodoSettings, type TodoState } from './types.js';
 export interface TodoServiceConfig {
     /** 调度 tick 间隔（ms）。 */
     tickMs?: number;
@@ -61,8 +61,8 @@ export declare class TodoService {
     /** 倒计时（如「距离六级考试还有 X 天」）。 */
     addCountdown(input: CountdownAddInput): CountdownItem;
     removeCountdown(id: string): void;
-    /** 开始一次专注计时（正向计时，不设时长）。 */
-    startFocus(taskId?: string): FocusRun;
+    /** 开始一次专注计时（正向计时，不设时长）。可只带自定义名称，也可关联待办。 */
+    startFocus(input?: FocusStartInput | string): FocusRun;
     /** 结束当前专注，落一条记录。 */
     stopFocus(): FocusSession;
     /** 删除一条专注记录。 */

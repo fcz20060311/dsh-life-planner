@@ -98,6 +98,7 @@ function normalizeFocusSession(raw: Record<string, unknown>): FocusSession | und
     endedAt,
     durationMs: finiteNum(raw.durationMs) ?? (endedAt - startedAt),
     taskId: typeof raw.taskId === 'string' && raw.taskId !== '' ? raw.taskId : undefined,
+    label: typeof raw.label === 'string' && raw.label.trim() !== '' ? raw.label.trim() : undefined,
   }
 }
 
@@ -172,7 +173,11 @@ export function loadDoc(file: string = todoDataFile()): PersistedTodoDoc {
     const startedAt = focusRaw === null ? undefined : finiteNum(focusRaw.startedAt)
     const focusRunning: FocusRun | null = startedAt === undefined
       ? null
-      : { startedAt, taskId: typeof focusRaw?.taskId === 'string' && focusRaw.taskId !== '' ? focusRaw.taskId : undefined }
+      : {
+          startedAt,
+          taskId: typeof focusRaw?.taskId === 'string' && focusRaw.taskId !== '' ? focusRaw.taskId : undefined,
+          label: typeof focusRaw?.label === 'string' && focusRaw.label.trim() !== '' ? focusRaw.label.trim() : undefined,
+        }
     const reminders: ReminderEvent[] = Array.isArray(parsed.reminders)
       ? (parsed.reminders.map((r) => normalizeReminder(r as Record<string, unknown>)).filter((r): r is ReminderEvent => r !== undefined))
       : []

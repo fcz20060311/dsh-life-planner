@@ -128,8 +128,8 @@ class TodoStore {
     await this.refresh()
   }
 
-  async focusStart(taskId?: string): Promise<void> {
-    await todoApi.focusStart(taskId)
+  async focusStart(input?: { taskId?: string, label?: string }): Promise<void> {
+    await todoApi.focusStart(input)
     await this.refresh()
   }
 

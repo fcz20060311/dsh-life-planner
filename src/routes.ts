@@ -318,7 +318,8 @@ export function makeTodoRoutes(service: TodoService): WebRoute[] {
     // 专注（正向计时）
     postRoute(`${TODO_API_PREFIX}/focus/start`, (body) => {
       const taskId = typeof body.taskId === 'string' && body.taskId !== '' ? body.taskId : undefined
-      return { ok: true, focusRunning: service.startFocus(taskId) }
+      const label = typeof body.label === 'string' ? body.label : undefined
+      return { ok: true, focusRunning: service.startFocus({ taskId, label }) }
     }),
 
     postRoute(`${TODO_API_PREFIX}/focus/stop`, () => {

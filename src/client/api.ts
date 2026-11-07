@@ -49,8 +49,8 @@ export const todoApi = {
   addCountdown: (input: { title: string, targetDate: string }) =>
     todoFetch<{ ok: boolean, countdown: CountdownItem }>('/api/life/countdown/add', input),
   removeCountdown: (id: string) => todoFetch<{ ok: boolean }>('/api/life/countdown/delete', { id }),
-  focusStart: (taskId?: string) =>
-    todoFetch<{ ok: boolean, focusRunning: FocusRun }>('/api/life/focus/start', taskId === undefined ? {} : { taskId }),
+  focusStart: (input?: { taskId?: string, label?: string }) =>
+    todoFetch<{ ok: boolean, focusRunning: FocusRun }>('/api/life/focus/start', input ?? {}),
   focusStop: () => todoFetch<{ ok: boolean, session: FocusSession }>('/api/life/focus/stop', {}),
   deleteFocus: (id: string) => todoFetch<{ ok: boolean }>('/api/life/focus/delete', { id }),
   heatmap: () => todoFetch<{ ok: boolean, heatmap: Record<string, HeatmapCell> }>('/api/life/heatmap'),

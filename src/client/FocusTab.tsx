@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useSyncExternalStore, type ReactElement } from 'react'
 import { todoStore } from './todo-store.ts'
-import type { FocusSession, TodoItem } from '../types.ts'
+import type { FocusSession } from '../types.ts'
 
 function formatDuration(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000))
@@ -25,7 +25,7 @@ function formatClock(ms: number): string {
 export function FocusTab(): ReactElement {
   const { data } = useSyncExternalStore(todoStore.subscribe, todoStore.getSnapshot)
   const [now, setNow] = useState(() => Date.now())
-  const [taskId, setTaskId] = useState('')
+  const [label, setLabel] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -40,7 +40,6 @@ export function FocusTab(): ReactElement {
 
   const running = data?.focusRunning ?? null
   const sessions = data?.focusSessions ?? []
-  const pending: TodoItem[] = (data?.todos ?? []).filter((t) => !t.done)
 
   useEffect(() => {
     if (running === null) return
@@ -55,7 +54,8 @@ export function FocusTab(): ReactElement {
     if (busy) return
     setBusy(true)
     try {
-      await todoStore.focusStart(taskId === '' ? undefined : taskId)
+      const trimmed = label.trim()
+      await todoStore.focusStart(trimmed === '' ? {} : { label: trimmed })
       setNow(Date.now())
     } finally {
       setBusy(false)
@@ -78,13 +78,20 @@ export function FocusTab(): ReactElement {
         {startedAt !== null ? formatDuration(now - startedAt) : '00:00'}
       </div>
 
+      {running?.label !== undefined ? <div className="life-focus-label">{running.label}</div> : null}
+
       <div className="todo-form-row">
-        <select className="todo-select" value={taskId} onChange={(e) => setTaskId(e.target.value)} title="关联一条待办（可选）" disabled={startedAt !== null}>
-          <option value="">不关联任务</option>
-          {pending.map((t) => (
-            <option key={t.id} value={t.id}>{t.title}</option>
-          ))}
-        </select>
+        <input
+          className="todo-input"
+          value={label}
+          maxLength={40}
+          placeholder="这次专注做什么？（可留空）"
+          disabled={startedAt !== null}
+          onChange={(e) => setLabel(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && startedAt === null) void start()
+          }}
+        />
         {startedAt !== null ? (
           <button type="button" className="todo-btn danger" onClick={() => void stop()}>结束专注</button>
         ) : (
@@ -108,7 +115,9 @@ export function FocusTab(): ReactElement {
                 <div className="todo-item-title">{formatDuration(s.durationMs)}</div>
                 <div className="todo-item-meta">
                   <span>{formatClock(s.startedAt)} – {formatClock(s.endedAt)}</span>
-                  {s.taskId !== undefined ? <span>关联任务</span> : null}
+                  {s.label !== undefined
+                    ? <span>{s.label}</span>
+                    : s.taskId !== undefined ? <span>关联任务</span> : null}
                 </div>
               </div>
               <div className="todo-actions">

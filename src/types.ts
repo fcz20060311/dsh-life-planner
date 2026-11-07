@@ -75,6 +75,14 @@ export interface FocusRun {
   startedAt: number
   /** 关联任务（可选）。 */
   taskId?: string
+  /** 自定义名称（可选）：这次专注在做什么，自由填写。 */
+  label?: string
+}
+
+/** 开始专注的入参：可带自定义名称，也可关联待办。 */
+export interface FocusStartInput {
+  taskId?: string
+  label?: string
 }
 
 /** 一次已完成的专注记录。 */
@@ -84,6 +92,8 @@ export interface FocusSession {
   endedAt: number
   durationMs: number
   taskId?: string
+  /** 自定义名称（可选）。 */
+  label?: string
 }
 
 
