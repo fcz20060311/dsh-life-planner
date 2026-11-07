@@ -1,10 +1,10 @@
 /**
- * 统计页签：累计专注时长 + 完成数 + 近半年热力图（GitHub 风格）。
- * 热力图由客户端从 focusSessions + 已完成待办的 completedAt 直接聚合，无需额外接口。
+ * 统计页签：累计专注时长 + 用时扇形图（日/周/月切换）+ 近半年热力图（GitHub 风格）。
+ * 全部由客户端从 focusSessions + 已完成待办的 completedAt 直接聚合，无需额外接口。
  * @module dsh-life-planner/client/StatsTab
  */
 
-import { useSyncExternalStore, type ReactElement } from 'react'
+import { useSyncExternalStore, useState, type ReactElement } from 'react'
 import { todoStore } from './todo-store.ts'
 
 function dayKey(d: Date): string {
@@ -16,19 +16,84 @@ function formatDuration(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000))
   const h = Math.floor(total / 3600)
   const m = Math.floor((total % 3600) / 60)
-  return h > 0 ? `${h} 小时 ${m} 分` : `${m} 分钟`
+  if (h > 0) return m > 0 ? `${h} 小时 ${m} 分` : `${h} 小时`
+  return `${m} 分钟`
+}
+
+/** 图例里的短时长：1h20m / 25m。 */
+function shortDuration(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 60_000))
+  const h = Math.floor(total / 60)
+  const m = total % 60
+  if (h > 0) return m > 0 ? `${h}h${m}m` : `${h}h`
+  return `${m}m`
+}
+
+function startOfDay(d: Date): Date {
+  const x = new Date(d)
+  x.setHours(0, 0, 0, 0)
+  return x
+}
+
+/** 本周一 0 点。 */
+function startOfWeek(d: Date): Date {
+  const x = startOfDay(d)
+  const day = x.getDay() // 0=周日
+  x.setDate(x.getDate() - ((day + 6) % 7))
+  return x
+}
+
+function startOfMonth(d: Date): Date {
+  const x = startOfDay(d)
+  x.setDate(1)
+  return x
+}
+
+type Range = 'day' | 'week' | 'month'
+
+const RANGES: Array<{ key: Range; label: string }> = [
+  { key: 'day', label: '今天' },
+  { key: 'week', label: '本周' },
+  { key: 'month', label: '本月' },
+]
+
+const PIE_COLORS = ['#e0a94f', '#7fbf9a', '#7aa7d4', '#b08ad4', '#e08d6f', '#d47f9d', '#8fa9a0', '#c9b46f']
+
+function rangeStart(range: Range, now: Date): Date {
+  if (range === 'day') return startOfDay(now)
+  if (range === 'week') return startOfWeek(now)
+  return startOfMonth(now)
 }
 
 const WEEKS = 26
 
 export function StatsTab(): ReactElement {
   const { data } = useSyncExternalStore(todoStore.subscribe, todoStore.getSnapshot)
+  const [range, setRange] = useState<Range>('day')
   const todos = data?.todos ?? []
   const sessions = data?.focusSessions ?? []
   const now = data?.now ?? Date.now()
 
   const totalFocusMs = sessions.reduce((sum, s) => sum + s.durationMs, 0)
   const completedCount = todos.filter((t) => t.done).length
+
+  // 扇形图：按「关联的待办」聚合所选时间段的专注时长。
+  const titleOf = (taskId: string | undefined): string => {
+    if (taskId === undefined) return '未关联任务'
+    const hit = todos.find((t) => t.id === taskId)
+    return hit === undefined ? '未关联任务' : hit.title
+  }
+  const start = rangeStart(range, new Date(now)).getTime()
+  const pieMap = new Map<string, number>()
+  for (const s of sessions) {
+    if (s.endedAt < start || s.durationMs <= 0) continue
+    const key = titleOf(s.taskId)
+    pieMap.set(key, (pieMap.get(key) ?? 0) + s.durationMs)
+  }
+  const slices = [...pieMap.entries()]
+    .map(([title, ms]) => ({ title, ms }))
+    .sort((a, b) => b.ms - a.ms)
+  const pieTotal = slices.reduce((sum, s) => sum + s.ms, 0)
 
   // 聚合每「自然日」的活动量：完成数 + 专注（每满 30 分钟算 1 个单位）。
   const activity = new Map<string, { tasks: number; focusMs: number }>()
@@ -61,10 +126,8 @@ export function StatsTab(): ReactElement {
   const today = new Date(now)
   const endOfWeek = new Date(today)
   endOfWeek.setHours(0, 0, 0, 0)
-  // 让最后一列是「本周」，向前铺。
   const columns: Array<string[]> = []
   for (let w = WEEKS - 1; w >= 0; w--) {
-    // 找到该列的周日（getDay() 0=周日），再顺延 7 天。
     const sunday = new Date(endOfWeek)
     sunday.setDate(endOfWeek.getDate() - w * 7)
     sunday.setDate(sunday.getDate() - sunday.getDay())
@@ -78,6 +141,9 @@ export function StatsTab(): ReactElement {
   }
 
   const totalUnits = [...activity.values()].reduce((sum, c) => sum + c.tasks + Math.floor(c.focusMs / (30 * 60_000)), 0)
+
+  const R = 46
+  const CIRC = 2 * Math.PI * R
 
   return (
     <div className="life-tab">
@@ -95,6 +161,69 @@ export function StatsTab(): ReactElement {
           <div className="life-stat-label">专注次数</div>
         </div>
       </div>
+
+      <div className="life-pie-head">
+        <span className="life-pie-title">花在哪了</span>
+        <div className="life-pie-switch">
+          {RANGES.map((r) => (
+            <button
+              key={r.key}
+              type="button"
+              className="life-pie-tab"
+              data-active={range === r.key ? 'true' : undefined}
+              onClick={() => setRange(r.key)}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {slices.length === 0 ? (
+        <div className="todo-empty">这段时间还没有专注记录。</div>
+      ) : (
+        <div className="life-pie">
+          <svg className="life-pie-svg" viewBox="0 0 120 120" role="img" aria-label="用时分布扇形图">
+            <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(0,0,0,.08)" strokeWidth="14" />
+            {(() => {
+              let offset = 0
+              return slices.map((s, i) => {
+                const len = (s.ms / pieTotal) * CIRC
+                const el = (
+                  <circle
+                    key={s.title}
+                    cx="60"
+                    cy="60"
+                    r={R}
+                    fill="none"
+                    stroke={PIE_COLORS[i % PIE_COLORS.length]}
+                    strokeWidth="14"
+                    strokeDasharray={`${Math.max(len - 1.5, 0)} ${CIRC}`}
+                    strokeDashoffset={-offset}
+                    transform="rotate(-90 60 60)"
+                  >
+                    <title>{`${s.title}：${formatDuration(s.ms)}（${Math.round((s.ms / pieTotal) * 100)}%）`}</title>
+                  </circle>
+                )
+                offset += len
+                return el
+              })
+            })()}
+            <text x="60" y="57" textAnchor="middle" className="life-pie-center">{shortDuration(pieTotal)}</text>
+            <text x="60" y="73" textAnchor="middle" className="life-pie-center-label">合计</text>
+          </svg>
+          <div className="life-pie-legend">
+            {slices.map((s, i) => (
+              <div className="life-pie-row" key={s.title} title={formatDuration(s.ms)}>
+                <span className="life-pie-dot" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
+                <span className="life-pie-name">{s.title}</span>
+                <span className="life-pie-val">{Math.round((s.ms / pieTotal) * 100)}%</span>
+                <span className="life-pie-time">{shortDuration(s.ms)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="life-heat-title">近 {WEEKS} 周活动（完成任务 + 每 30 分钟专注计 1 格）</div>
       <div className="life-heat">

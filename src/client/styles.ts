@@ -503,6 +503,23 @@ html[data-dsh-todo-active] [data-dsh-todo-host] > :not([data-dsh-todo-view]) {
 .life-heat-cell[data-level='4'] { background: var(--dsw-alias-state-business-primary); }
 .life-heat-legend { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--dsw-alias-label-tertiary); flex: none; }
 
+/* --- 用时扇形图（日/周/月） --------------------------------------------- */
+.life-pie-head { display: flex; align-items: center; gap: 8px; }
+.life-pie-title { flex: 1; font-size: 12.5px; font-weight: 700; color: var(--dsw-alias-label-secondary); }
+.life-pie-switch { display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--dsw-alias-interactive-bg-hover); }
+.life-pie-tab { padding: 2px 9px; font-size: 11.5px; border: 0; border-radius: 6px; background: transparent; color: var(--dsw-alias-label-tertiary); cursor: pointer; font-family: inherit; }
+.life-pie-tab[data-active] { background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, .16); }
+.life-pie { display: flex; align-items: center; gap: 14px; }
+.life-pie-svg { width: 118px; height: 118px; flex: none; }
+.life-pie-center { font-size: 15px; font-weight: 700; fill: var(--dsw-alias-label-primary); }
+.life-pie-center-label { font-size: 8px; fill: var(--dsw-alias-label-tertiary); letter-spacing: .16em; }
+.life-pie-legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; max-height: 118px; overflow-y: auto; }
+.life-pie-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; }
+.life-pie-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.life-pie-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); }
+.life-pie-val { flex: none; font-variant-numeric: tabular-nums; color: var(--dsw-alias-label-tertiary); }
+.life-pie-time { flex: none; width: 44px; text-align: right; font-variant-numeric: tabular-nums; color: var(--dsw-alias-label-tertiary); }
+
 /* --- 便签墙（Sticky wall）风格 ------------------------------------------- */
 .life-board {
   padding: 10px;
